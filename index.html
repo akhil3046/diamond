@@ -454,9 +454,20 @@
     .viewer-embed {
       width: 100%;
       height: calc(100% - 97px);
-      border: 0;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #d8d2ca;
+      overflow: auto;
+    }
+
+    .viewer-embed img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .viewer-stage::after {
@@ -772,13 +783,7 @@
             </div>
             <button class="viewer-toggle" id="focusViewer" type="button">Focus viewer</button>
           </div>
-          <iframe
-            id="viewerFrame"
-            class="viewer-embed"
-            title="Document preview"
-            loading="lazy"
-            allowfullscreen
-          ></iframe>
+          <div id="viewerFrame" class="viewer-embed"></div>
         </article>
 
         <aside class="viewer-side">
@@ -816,13 +821,7 @@
             </div>
             <button class="viewer-toggle" id="focusQuoteViewer" type="button">Focus viewer</button>
           </div>
-          <iframe
-            id="quoteViewerFrame"
-            class="viewer-embed"
-            title="Quotation preview"
-            loading="lazy"
-            allowfullscreen
-          ></iframe>
+          <div id="quoteViewerFrame" class="viewer-embed"></div>
         </article>
 
         <aside class="viewer-side">
@@ -834,7 +833,7 @@
           <section class="panel">
             <h3>Quotation Note</h3>
             <p class="doc-note">
-              These quotation PDFs are shown separately to preserve a cleaner primary review flow. The presentation remains informational and draft-oriented.
+              This quotation PDF is shown separately to preserve a cleaner primary review flow. The presentation remains informational and draft-oriented.
             </p>
           </section>
         </aside>
@@ -939,7 +938,7 @@
               <strong>Quote 1 PDF</strong>
               <p>International commercial quotation layout referencing the two diamonds, issued recipient details, total INR and approximate USD values, and a declaration that values are quoted commercial values rather than independent appraisal figures.</p>
             </div>
-            
+
             <div class="quote-block">
               <strong>Prepared As A Draft</strong>
               <p>Prepared for Mr. Kumara Swamy Vandrasi, Visakhapatnam, Andhra Pradesh, India.<br>Prepared as a draft using client-supplied information.</p>
@@ -968,10 +967,10 @@
         type: "Primary PDF",
         title: "doc 1.pdf",
         description: "First main supporting PDF supplied by the client.",
-        file: "./assets/1000491653.jpg#toolbar=0&navpanes=0&scrollbar=0&view=FitH",
+        file: "./assets/1000491653.jpg",
         meta: {
           Category: "Primary document",
-          Format: "Embedded PDF preview",
+          Format: "Embedded image preview",
           Access: "On-page viewing",
           Source: "Client provided"
         }
@@ -982,10 +981,10 @@
         type: "Primary PDF",
         title: "doc 2.pdf",
         description: "Second main supporting PDF supplied by the client.",
-        file: "./assets/1000491654.jpg#toolbar=0&navpanes=0&scrollbar=0&view=FitH",
+        file: "./assets/1000491654.jpg",
         meta: {
           Category: "Primary document",
-          Format: "Embedded PDF preview",
+          Format: "Embedded image preview",
           Access: "On-page viewing",
           Source: "Client provided"
         }
@@ -999,15 +998,13 @@
         type: "Quotation PDF",
         title: "quote 1.pdf",
         description: "Quotation PDF summarizing the two item values and overall total.",
-        file: "./assets/1000491655.jpg#toolbar=0&navpanes=0&scrollbar=0&view=FitH",
+        file: "./assets/1000491655.jpg",
         meta: {
           Category: "Quotation support",
-          Format: "Embedded PDF preview",
+          Format: "Embedded image preview",
           Access: "On-page viewing",
           Source: "Client provided"
         }
-      },
-    
       }
     ];
 
@@ -1035,11 +1032,20 @@
       });
     }
 
+    function renderImage(container, item) {
+      container.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = item.file;
+      img.alt = item.title;
+      img.draggable = false;
+      container.appendChild(img);
+    }
+
     function setActiveDocument(id) {
       const item = mainDocuments.find((entry) => entry.id === id) || mainDocuments[0];
       viewerTitle.textContent = item.title;
       viewerDescription.textContent = item.description;
-      viewerFrame.src = item.file;
+      renderImage(viewerFrame, item);
       renderDetails(detailList, item.meta);
 
       docGrid.querySelectorAll(".doc-trigger").forEach((button) => {
@@ -1052,7 +1058,7 @@
       const item = quotationDocuments.find((entry) => entry.id === id) || quotationDocuments[0];
       quoteViewerTitle.textContent = item.title;
       quoteViewerDescription.textContent = item.description;
-      quoteViewerFrame.src = item.file;
+      renderImage(quoteViewerFrame, item);
       renderDetails(quoteDetailList, item.meta);
 
       quoteGrid.querySelectorAll(".doc-trigger").forEach((button) => {
